@@ -29,20 +29,21 @@ class APIScrapper:
         self._curr.execute("SELECT * FROM SP500;")
         self._tickers = [ticker[0] for ticker in self._curr.fetchall()]
 
-    def store_ticker_ohlic(self):
+    def store_ticker_ohlc(self):
         api = 'yahoo'
         # Get latest dates from entries
-        start = dt.datetaime(2000, 1, 1) # temp
-        end = dt.datetime(2018, 12, 12) # temp
+        start = dt.datetime(2018, 12, 18) # pull from db the date of the last data pulled
+        end = dt.datetime.now().date() # todays date
 
         for ticker in self._tickers:
             # Separate date into three dolumns for future ref table should store (year/month/day/oprn/high/low/close/adj_val)
-            dt = web.DataReader(ticker, api, start, end)
+            data = web.DataReader(ticker, api, start, end)
+            date = pd.to_datetime(data.index.values[0]).date()
+            print(f'UPDATE SP500 SET date="{date}", open={data["Open"][0]}, high={data["High"][0]}, low={data["Low"][0]}, close={data["Close"][0]}, adj_close={data["Adj Close"][0]}, volume={data["Volume"][0]} WHERE ticker="{ticker}";')
+            self._curr.execute(f"UPDATE SP500 SET date='{date}', open={data['Open'][0]}, high={data['High'][0]}, low={data['Low'][0]}, close={data['Close'][0]}, adj_close={data['Adj Close'][0]}, volume={data['Volume'][0]} WHERE ticker='{ticker}';")
 
 api_scrapper = APIScrapper()
 with api_scrapper as s:
     s.get_tickers()
-    print(s._tickers)
-
-
+    s.store_ticker_ohlc()
 
