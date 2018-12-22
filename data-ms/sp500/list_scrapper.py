@@ -2,6 +2,7 @@ import bs4 as bs
 import pickle
 import requests
 import psycopg2
+import datetime as dt
 
 def pull_sp500_stocks():
     resp = requests.get('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
@@ -19,11 +20,13 @@ def store_to_db(tickers):
 
     # Drop and recreate table for updating tickers
     cur.execute("DROP TABLE SP500;")
-    cur.execute("CREATE TABLE SP500 (ticker)")
+    cur.execute("CREATE TABLE SP500 (ticker text[], date date);")
 
-     # Add to db
-    for ticker in tickers:
-        cur.execute(f"INSERT INTO SP500 (ticker) VALUES ('{ticker}');")
+    tickers = list(map(str, tickers))
+    # Add to db
+    stm = f"INSERT INTO SP500 (ticker, date) VALUES (%s, '{dt.datetime.now().date()}');"
+    cur.execute(stm, (tickers, ))
+
     conn.commit()
     cur.close()
     conn.close()

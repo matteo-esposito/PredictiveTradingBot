@@ -26,14 +26,14 @@ class APIScrapper:
         self._conn = None
 
     def get_tickers(self):
-        self._curr.execute("SELECT * FROM SP500;")
-        self._tickers = [ticker[0] for ticker in self._curr.fetchall()]
+        self._curr.execute("SELECT TICKER FROM SP500;")
+        self._tickers = self._curr.fetchall()[0][0];
 
     # TODO: Remove method when fill_db_from_last is implemented will update SP500 table with newest date (e.g. time.now())
     def store_ticker_ohlc(self):
         api = 'yahoo'
         # Get latest dates from entries
-        start = dt.datetime(2018, 12, 18) # pull from db the date of the last data pulled
+        start = dt.datetime().now()#   the date
         end = dt.datetime.now() # todays date
 
         for ticker in self._tickers:
@@ -56,4 +56,6 @@ class APIScrapper:
 
 api_scrapper = APIScrapper()
 with api_scrapper as s:
+    s.get_tickers()
     s.fill_database_from_last()
+
