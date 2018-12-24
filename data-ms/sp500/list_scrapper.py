@@ -27,6 +27,9 @@ def store_to_db(tickers):
     stm = f"INSERT INTO SP500 (ticker, date) VALUES (%s, '{dt.datetime.now().date()}');"
     cur.execute(stm, (tickers, ))
 
+    for ticker in tickers:
+        cur.execute(f'CREATE TABLE "{ticker}" (open decimal, high decimal, low decimal, close decimal, volume integer, adj_close decimal);')
+
     conn.commit()
     cur.close()
     conn.close()

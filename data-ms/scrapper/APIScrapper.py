@@ -25,7 +25,7 @@ class APIScrapper:
         self._curr = None
         self._conn = None
 
-    def get_tickers(self):
+    def get_create_tickers_tables(self):
         self._curr.execute("SELECT TICKER FROM SP500;")
         self._tickers = self._curr.fetchall()[0][0];
 
@@ -48,14 +48,15 @@ class APIScrapper:
 
     # Use SP500 table to get last updated date and retrieve all new data and store into db
     def fill_database_from_last(self):
-        self._curr.execute("SELECT DATE FROM SP500 LIMIT 1;")
+        self._curr.execute("SELECT DATE FROM SP500;")
         start = dt.datetime.combine(self._curr.fetchall()[0][0], dt.datetime.min.time())
         today = dt.datetime.now()
         print(start, today)
+        # Fill each ticker table
 
 
 api_scrapper = APIScrapper()
 with api_scrapper as s:
-    s.get_tickers()
+    s.get_create_tickers_tables()
     s.fill_database_from_last()
 
