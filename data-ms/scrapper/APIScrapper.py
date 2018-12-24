@@ -49,7 +49,6 @@ class APIScrapper:
         self._curr.execute("SELECT DATE FROM SP500;")
         start = dt.datetime.combine(self._curr.fetchall()[0][0], dt.datetime.min.time())
         today = dt.datetime.now()
-        print(start, today)
         # Update SP500 date with today's date
         self._curr.execute(f"UPDATE SP500 SET date='{today.date()}';")
         # Fill each ticker table
@@ -57,6 +56,7 @@ class APIScrapper:
             print(f'Updating {ticker} with newest data from {self._api} from {start.date()} to {today.date()}.')
 
 
+# TODO: Move to a fill_database_from_last() to CRON Job and the other into startup of the MS
 api_scrapper = APIScrapper()
 with api_scrapper as s:
     s.get_create_tickers_tables()
