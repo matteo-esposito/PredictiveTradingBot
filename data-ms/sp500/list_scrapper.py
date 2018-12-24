@@ -28,7 +28,8 @@ def store_to_db(tickers):
     cur.execute(stm, (tickers, ))
 
     for ticker in tickers:
-        cur.execute(f'CREATE TABLE "{ticker}" (open decimal, high decimal, low decimal, close decimal, volume integer, adj_close decimal);')
+        cur.execute(f'DROP TABLE "{ticker}";')
+        cur.execute(f'CREATE TABLE "{ticker}" (date date, open decimal, high decimal, low decimal, close decimal, adj_close decimal, volume integer);')
 
     conn.commit()
     cur.close()

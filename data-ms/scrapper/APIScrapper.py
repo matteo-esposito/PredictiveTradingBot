@@ -9,6 +9,7 @@ class APIScrapper:
         self._tickers = []
         self._conn = None
         self._curr = None
+        self._api = 'yahoo'
         print("API Scrapper initialized...")
 
     def __enter__(self):
@@ -29,22 +30,19 @@ class APIScrapper:
         self._curr.execute("SELECT TICKER FROM SP500;")
         self._tickers = self._curr.fetchall()[0][0];
 
-    # TODO: Remove method when fill_db_from_last is implemented will update SP500 table with newest date (e.g. time.now())
-    def store_ticker_ohlc(self):
-        api = 'yahoo'
-        # Get latest dates from entries
-        start = dt.datetime().now()#   the date
-        end = dt.datetime.now() # todays date
-
-        for ticker in self._tickers:
-            # Separate date into three dolumns for future ref table should store (year/month/day/oprn/high/low/close/adj_val)
-            data = web.DataReader(ticker, api, start, end)
-            date = pd.to_datetime(data.index.values[0]).date()
-            self._curr.execute(f"UPDATE SP500 SET date='{date}', open={data['Open'][0]}, high={data['High'][0]}, low={data['Low'][0]}, close={data['Close'][0]}, adj_close={data['Adj Close'][0]}, volume={data['Volume'][0]} WHERE ticker='{ticker}';")
-
     # Drop everything in database and refill from 2000
     def drop_refill_database(self):
-        pass
+        start = dt.datetime(2000, 1, 1)
+        end = dt.datetime.now()
+        for ticker in self._tickers:
+           self._curr.execute(f'DELETE FROM "{ticker}";')
+           data = web.DataReader(ticker, self._api, start, end)
+           for i in range(0, data.shape[0]):
+               row = data.iloc[i]
+               d = pd.to_datetime(row.name).date()
+               # uncomment line to execute update to db
+            # self._curr.execute(f"INSERT INTO \"{ticker}\" (date, open, high, low, adj_close, volume) VALUES ('{d}', {row['Open']}, {row['High']}, {row['Low']}, {row['Close']}, {row['Adj Close']}, {row['Volume']});")
+
 
     # Use SP500 table to get last updated date and retrieve all new data and store into db
     def fill_database_from_last(self):
@@ -52,11 +50,16 @@ class APIScrapper:
         start = dt.datetime.combine(self._curr.fetchall()[0][0], dt.datetime.min.time())
         today = dt.datetime.now()
         print(start, today)
+        # Update SP500 date with today's date
+        self._curr.execute(f"UPDATE SP500 SET date='{today.date()}';")
         # Fill each ticker table
+        for ticker in self._tickers:
+            print(f'Updating {ticker} with newest data from {self._api} from {start.date()} to {today.date()}.')
 
 
 api_scrapper = APIScrapper()
 with api_scrapper as s:
     s.get_create_tickers_tables()
-    s.fill_database_from_last()
+    s.drop_refill_database()
+    #s.fill_database_from_last()
 
