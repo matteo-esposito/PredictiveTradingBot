@@ -30,7 +30,7 @@ class APIScrapper:
         self._curr.execute("SELECT TICKER FROM SP500;")
         self._tickers = self._curr.fetchall()[0][0];
 
-    # Drop everything in database and refill from 2000
+    # Delete everything in each ticker table and refill from 2000
     def drop_refill_database(self):
         start = dt.datetime(2000, 1, 1)
         end = dt.datetime.now()
