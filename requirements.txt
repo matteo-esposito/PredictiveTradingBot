@@ -1,0 +1,8 @@
+sklearn
+psycopg2
+pandas
+pandas-datareader
+numpy
+Flask
+requests
+beautifulsoup4
