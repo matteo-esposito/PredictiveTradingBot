@@ -10,4 +10,5 @@ COPY src/ /app
 WORKDIR /app
 
 EXPOSE 80
-CMD ["python", "app.py"]
+ENTRYPOINT ["python"]
+CMD ["app.py"]
