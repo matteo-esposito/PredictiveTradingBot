@@ -57,9 +57,9 @@ class APIScrapper:
 
 
 # TODO: Move to a fill_database_from_last() to CRON Job and the other into startup of the MS
-api_scrapper = APIScrapper()
-with api_scrapper as s:
-    s.get_create_tickers_tables()
-    s.drop_refill_database()
-    #s.fill_database_from_last()
+#api_scrapper = APIScrapper()
+#with api_scrapper as s:
+#    s.get_create_tickers_tables()
+#    s.drop_refill_database()
+#    s.fill_database_from_last()
 
