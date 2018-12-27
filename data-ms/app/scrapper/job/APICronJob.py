@@ -19,6 +19,6 @@ class APICronJob:
             with sched as s:
                 s.fill_database_from_last()
 
-        self._scheduler.add_job(lambda: api_call_job(sched=api_scheduler), trigger='interval', seconds=3)
+        self._scheduler.add_job(lambda: api_call_job(sched=api_scheduler), trigger='cron', day_of_week='mon-fri', hour=23, minute=59)
         self._scheduler.start()
 
