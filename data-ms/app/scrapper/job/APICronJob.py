@@ -8,14 +8,16 @@ class APICronJob:
     def __init__(self):
         self._scheduler = BackgroundScheduler()
         self._api_scheduler = api_scrapper.APIScrapper()
+        # Init _api_scheduler with tickers from db at cron job creation and data from 2000-01-01
+        with self._api_scheduler as s:
+            s.get_create_tickers_tables()
+            s.drop_refill_database()
 
     def start_api_job(self):
-        # TODO: Refactor for better implementation
         api_scheduler = self._api_scheduler
         def api_call_job(sched):
             with sched as s:
-                s.get_create_tickers_tables()
-                print(s._tickers)
+                s.fill_database_from_last()
 
         self._scheduler.add_job(lambda: api_call_job(sched=api_scheduler), trigger='interval', seconds=3)
         self._scheduler.start()

@@ -35,14 +35,8 @@ class APIScrapper:
         start = dt.datetime(2000, 1, 1)
         end = dt.datetime.now()
         for ticker in self._tickers:
-           self._curr.execute(f'DELETE FROM "{ticker}";')
-           data = web.DataReader(ticker, self._api, start, end)
-           for i in range(0, data.shape[0]):
-               row = data.iloc[i]
-               d = pd.to_datetime(row.name).date()
-               # uncomment line to execute update to db
-            # self._curr.execute(f"INSERT INTO \"{ticker}\" (date, open, high, low, adj_close, volume) VALUES ('{d}', {row['Open']}, {row['High']}, {row['Low']}, {row['Close']}, {row['Adj Close']}, {row['Volume']});")
-
+            self._curr.execute(f'DELETE FROM "{ticker}";')
+            self.insert_to_db(ticker.replace('.', '-'), start, end)
 
     # Use SP500 table to get last updated date and retrieve all new data and store into db
     def fill_database_from_last(self):
@@ -53,13 +47,14 @@ class APIScrapper:
         self._curr.execute(f"UPDATE SP500 SET date='{today.date()}';")
         # Fill each ticker table
         for ticker in self._tickers:
-            print(f'Updating {ticker} with newest data from {self._api} from {start.date()} to {today.date()}.')
+            self.insert_to_db(ticker.replace('.', '-'), start, end)
 
+    def insert_to_db(self, ticker, start, end):
+        print(f'Updating {ticker} with data from {self._api} from {start} to {end}.')
+        data = web.DataReader(ticker, self._api, start, end)
+        for i in range(0, data.shape[0]):
+            row = data.iloc[i]
+            d = pd.to_datetime(row.name).date()
+            # self._curr.execute(f"INSERT INTO \"{ticker}\" (date, open, high, low, adj_close, volume) VALUES ('{d}', {row['Open']}, {row['High']}, {row['Low']}, {row['Close']}, {row['Adj Close']}, {row['Volume']});")
 
-# TODO: Move to a fill_database_from_last() to CRON Job and the other into startup of the MS
-#api_scrapper = APIScrapper()
-#with api_scrapper as s:
-#    s.get_create_tickers_tables()
-#    s.drop_refill_database()
-#    s.fill_database_from_last()
 
