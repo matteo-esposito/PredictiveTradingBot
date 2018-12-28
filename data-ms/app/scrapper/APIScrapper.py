@@ -34,6 +34,9 @@ class APIScrapper:
     def drop_refill_database(self):
         start = dt.datetime(2000, 1, 1)
         end = dt.datetime.now()
+        # Update SP500 date with today's date
+        self._curr.execute(f"UPDATE SP500 SET date='{end.date()}';")
+        print(f'Updating SP500 date to {end.date()}')
         for ticker in self._tickers:
             self._curr.execute(f'DELETE FROM "{ticker}";')
             self.insert_to_db(ticker.replace('.', '-'), start, end)
@@ -45,9 +48,10 @@ class APIScrapper:
         today = dt.datetime.now()
         # Update SP500 date with today's date
         self._curr.execute(f"UPDATE SP500 SET date='{today.date()}';")
+        print(f'Updating SP500 date to {end.date()}')
         # Fill each ticker table
         for ticker in self._tickers:
-            self.insert_to_db(ticker.replace('.', '-'), start, end)
+            self.insert_to_db(ticker.replace('.', '-'), start, today)
 
     def insert_to_db(self, ticker, start, end):
         print(f'Updating {ticker} with data from {self._api} from {start} to {end}.')
