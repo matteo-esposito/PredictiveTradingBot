@@ -16,6 +16,5 @@ RUN \
 
 COPY .  /app
 
-EXPOSE 80
-ENTRYPOINT ["python"]
-CMD ["app.py"]
+ENTRYPOINT ["python3"]
+CMD ["app/app.py"]
