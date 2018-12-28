@@ -2,12 +2,15 @@ import atexit
 import time
 import scrapper.APIScrapper as api_scrapper
 from apscheduler.schedulers.background import BackgroundScheduler
+import sp500.list_scrapper as sp500
 
 class APICronJob:
 
     def __init__(self):
         self._scheduler = BackgroundScheduler()
         self._api_scheduler = api_scrapper.APIScrapper()
+        # Init SP500 db and its ticker tables
+        sp500.store_to_db(sp500.pull_sp500_stocks())
         # Init _api_scheduler with tickers from db at cron job creation and data from 2000-01-01
         with self._api_scheduler as s:
             s.get_create_tickers_tables()
