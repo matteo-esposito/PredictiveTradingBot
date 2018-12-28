@@ -9,6 +9,7 @@ class APIScrapper:
         self._tickers = []
         self._conn = None
         self._curr = None
+        # TODO: See issue #4: yahoo is deprecated
         self._api = 'yahoo'
         print("API Scrapper initialized...")
 
@@ -54,8 +55,8 @@ class APIScrapper:
             self.insert_to_db(ticker.replace('.', '-'), start, today)
 
     def insert_to_db(self, ticker, start, end):
-        print(f'Updating {ticker} with data from {self._api} from {start} to {end}.')
         data = web.DataReader(ticker, self._api, start, end)
+        print(f'Updating {ticker} with data from {self._api} from {start} to {end}.')
         for i in range(0, data.shape[0]):
             row = data.iloc[i]
             d = pd.to_datetime(row.name).date()
