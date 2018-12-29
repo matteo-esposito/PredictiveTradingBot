@@ -1,6 +1,6 @@
 def getLinearPredictions(df):
     ''' Outputs the predictions of an ordinary least squares linear regression
-        for the close price.
+        for the close price of given stocks.
     '''
 
     # Set up features and response tables.
