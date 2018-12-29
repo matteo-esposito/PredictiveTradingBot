@@ -14,7 +14,7 @@ class APIScrapper:
         print("API Scrapper initialized...")
 
     def __enter__(self):
-        self._conn = psycopg2.connect('dbname=ModelData user=postgres password=123')
+        self._conn = psycopg2.connect('dbname=postgres user=postgres password=123 host=postgres')
         self._curr = self._conn.cursor()
         return self
 

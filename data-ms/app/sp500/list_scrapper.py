@@ -15,11 +15,9 @@ def pull_sp500_stocks():
     return tickers
 
 def store_to_db(tickers):
-    conn = psycopg2.connect('dbname=ModelData user=postgres password=123')
+    conn = psycopg2.connect('dbname=postgres user=postgres password=123 host=postgres')
     cur = conn.cursor()
 
-    # Drop and recreate table for updating tickers
-    cur.execute("DROP TABLE SP500;")
     cur.execute("CREATE TABLE SP500 (ticker text[], date date);")
 
     tickers = list(map(str, tickers))
@@ -28,13 +26,9 @@ def store_to_db(tickers):
     cur.execute(stm, (tickers, ))
 
     for ticker in tickers:
-        cur.execute(f'DROP TABLE "{ticker}";')
         cur.execute(f'CREATE TABLE "{ticker}" (date date, open decimal, high decimal, low decimal, close decimal, adj_close decimal, volume integer);')
 
     conn.commit()
     cur.close()
     conn.close()
-
-# This file should be called whenever there is a need to update the tickers
-store_to_db(pull_sp500_stocks())
 
